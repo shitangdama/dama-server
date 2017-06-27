@@ -1,0 +1,15 @@
+{
+  "name": "dama-danmu",
+  "version": "0.0.1",
+  "description": "dama danmu server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "dama",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "socket.io": "^1.7.3"
+  }
+}
