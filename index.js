@@ -77,7 +77,7 @@ function hasValuew(value) {
 }
 
 io.listen(3000)
-
+//111111
 // 想要在做一个ws的推送，转移到index1中做
 // // 控制用
 // const Koa = require('koa');
