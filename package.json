@@ -9,7 +9,5 @@
   "author": "dama",
   "license": "MIT",
   "dependencies": {
-    "lodash": "^4.17.4",
-    "socket.io": "^1.7.3"
   }
 }
