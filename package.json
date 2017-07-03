@@ -1,13 +1,10 @@
 {
-  "name": "dama-danmu",
+  "name": "shuchuceshi",
   "version": "0.0.1",
-  "description": "dama danmu server",
   "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
-  },
   "author": "dama",
-  "license": "MIT",
+  "license": "ISO",
   "dependencies": {
+    "log4js": "^1.1.1"
   }
 }
