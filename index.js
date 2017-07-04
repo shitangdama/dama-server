@@ -1,15 +1,6 @@
 const log4js = require('log4js');
 const WebSocket = require('ws');
 var logger = log4js.getLogger();
-// logger.level = 'debug';
-
-// setInterval(function(){
-//   console.log(111111111111)
-//   console.log("111111111111")
-//   console.log("asdasdasd")
-//   console.log("测试")
-//   logger.debug("Some debug messages");
-// },1000)
 
 const = new WebSocket.Server({ port: 3000 });
 
