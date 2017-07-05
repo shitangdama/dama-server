@@ -5,6 +5,7 @@
   "author": "dama",
   "license": "ISO",
   "dependencies": {
-    "log4js": "^1.1.1"
+    "log4js": "^1.1.1",
+    "ws": "^3.0.0"
   }
 }
