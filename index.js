@@ -12,6 +12,5 @@ wss.on('connection', function connection(ws) {
       console.log("asdasdasd")
       console.log("测试")
       logger.debug("Some debug messages");
-      ws.send('something');
   });
 });
