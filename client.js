@@ -6,7 +6,7 @@ for(let i=1; i<400;i++){
     console.log("aaaaaaaaaaaaaa"+i)
     setInterval(function(){
         ws.send('i am ' + i);
-        console.log("eee"+i)
+        console.log("aaa"+i)
     },i*1000)
   });
 
