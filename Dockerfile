@@ -1,9 +1,16 @@
 FROM node:latest
 
-COPY . /src
-WORKDIR /src
-RUN npm i
+USER root
+
+RUN mkdir /app
+WORKDIR /app
+
+COPY dist/ /app/
+COPY package.json /app/package.json
+COPY package-lock.json /app/package-lock.json
+
+RUN npm install --registry=https://registry.npm.taobao.org
 
 EXPOSE 3000
 
-CMD ["node", "./index.js"]
+CMD ["node", "./app.js"]
