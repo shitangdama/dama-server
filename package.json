@@ -4,15 +4,27 @@
   "main": "",
   "author": "dama",
   "license": "ISO",
+  "scripts": {
+    "start": "node index.js",
+    "prestart:prod": "tsc",
+    "start:prod": "node dist/server.js"
+  },
   "dependencies": {
-    "@types/koa": "^2.0.39",
-    "koa": "^2.3.0",
-    "log4js": "^1.1.1",
-    "ws": "^3.0.0"
+    "@nestjs/common": "*",
+    "@nestjs/core": "*",
+    "@nestjs/microservices": "*",
+    "@nestjs/testing": "*",
+    "@nestjs/websockets": "*",
+    "body-parser": "^1.17.2",
+    "express": "^4.15.4",
+    "redis": "^2.7.1",
+    "reflect-metadata": "^0.1.10",
+    "rxjs": "^5.4.0",
+    "typescript": "^2.2.1"
   },
   "devDependencies": {
+    "@types/express": "^4.0.37",
     "@types/node": "^8.0.25",
-    "ts-loader": "^2.3.4",
-    "typescript": "^2.4.2"
+    "ts-node": "^3.3.0"
   }
 }
