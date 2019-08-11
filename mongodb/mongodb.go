@@ -2,24 +2,23 @@ package mongodb
 
 import (
 	"context"
-	"log"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-// MongoDB struct
+// MongoDB struct 只负责生成mongo的client
 type MongoDB struct {
 	Client      *mongo.Client
 	Ctx         context.Context
 	ServiceAddr string
+	DBName      string
 }
 
 // NewDBClient new
-func NewDBClient(url string) *MongoDB {
+func NewDBClient(url string, name string) *MongoDB {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(url))
 	if err != nil {
@@ -29,6 +28,7 @@ func NewDBClient(url string) *MongoDB {
 		ServiceAddr: url,
 		Client:      client,
 		Ctx:         ctx,
+		DBName:      name,
 	}
 }
 
@@ -40,19 +40,7 @@ func (mongoDB *MongoDB) PingTest() {
 	}
 }
 
-// InsertOne insert
-func (mongoDB *MongoDB) InsertOne(data bson.D) {
-	mongoDB.Client.Database("test").Collection("trainers")
-	_, err := mongoDB.Client.InsertOne(context.TODO(), data)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+// Database returns a handle for a given database.
+func (mongoDB *MongoDB) Database() *mongo.Database {
+	return mongoDB.Client.Database(mongoDB.DBName)
 }
-
-// err = client.Disconnect(context.TODO())
-
-// if err != nil {
-//     log.Fatal(err)
-// }
-// fmt.Println("Connection to MongoDB closed.")
