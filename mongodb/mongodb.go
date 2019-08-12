@@ -40,7 +40,7 @@ func (mongoDB *MongoDB) PingTest() {
 	}
 }
 
-// Database returns a handle for a given database.
-func (mongoDB *MongoDB) Database() *mongo.Database {
+// GetDatabase returns a handle for a given database.
+func (mongoDB *MongoDB) GetDatabase() *mongo.Database {
 	return mongoDB.Client.Database(mongoDB.DBName)
 }
