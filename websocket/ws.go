@@ -61,6 +61,8 @@ func (c *Connection) DisConnect() error {
 // ReceiveMessage handle message from server
 func (c *Connection) ReceiveMessage(handle func(msg []byte)) {
 	for {
+		// 这里设计一个ctx
+
 		t, msg, err := c.ReadMessage()
 
 		if err != nil {
