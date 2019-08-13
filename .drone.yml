@@ -1,0 +1,10 @@
+---
+kind: pipeline
+name: default
+
+steps:
+- name: testing
+  image: python
+  commands:
+  - echo "test1"
+  - echo "test2"

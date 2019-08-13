@@ -52,6 +52,12 @@ func (c *Connection) Subscribe(subEvent interface{}) error {
 	return nil
 }
 
+func (c *Connection) DisConnect() error {
+	return nil
+}
+
+// 可以设计一个ctx，然后退出
+
 // ReceiveMessage handle message from server
 func (c *Connection) ReceiveMessage(handle func(msg []byte)) {
 	for {
