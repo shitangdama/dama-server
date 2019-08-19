@@ -29,8 +29,6 @@ type Connection struct {
 const (
 	Running int = iota
 	Stopped
-	Rebooting
-	Terminated
 )
 
 // NewConnection return new connection
@@ -81,17 +79,16 @@ func (c *Connection) CloseConnection() {
 	}
 
 	fmt.Println("关闭链接")
-	c.State = Terminated
+	c.State = Running
 }
 
 // HeartBeat 注册一个心跳函数用于检测链接，周期和
 func (c *Connection) HeartBeat() {
-	timer := time.NewTimer(1 * time.Second)
-	fmt.Println("开启心跳监控")
+	timer := time.NewTicker(time.Duration(5) * time.Second)
 
 	// 心跳监控是对远程的
-	// return map[string]interface{}{"ping": time.Duration(time.Now().Nanosecond())}
 	go func() {
+		fmt.Println("开启心跳监控")
 		for {
 			select {
 			case <-timer.C:
@@ -99,6 +96,7 @@ func (c *Connection) HeartBeat() {
 				err := c.Ws.WriteJSON(map[string]interface{}{"ping": time.Duration(time.Now().Nanosecond())})
 				if err != nil {
 					fmt.Println("检查远端有问题")
+					_ = c.ReConnect()
 				}
 			case <-c.ctx.Done():
 				timer.Stop()
@@ -131,7 +129,8 @@ func (c *Connection) Watch(handle func(msg []byte)) {
 			default:
 				// err := c.Ws.SetReadDeadline(time.Now().Add(5 * time.Second))
 				// if err != nil {
-				// 	c.ReConnect()
+				// 	// 	c.ReConnect()
+				// 	fmt.Println("重启2")
 				// 	continue
 				// }
 				c.ReceiveMessage(handle)
@@ -145,12 +144,11 @@ func (c *Connection) ReceiveMessage(handle func(msg []byte)) {
 
 	t, msg, err := c.Ws.ReadMessage()
 	if err != nil {
-		log.Println(err)
-		// if c.State == Terminated {
-		// 	log.Println("exiting receive message goroutine.")
-		// }
-		c.ReConnect()
-		time.Sleep(1 * time.Second)
+		fmt.Println("重启")
+		err := c.ReConnect()
+		if err != nil {
+			time.Sleep(1 * time.Second)
+		}
 		return
 	}
 
@@ -164,5 +162,4 @@ func (c *Connection) ReceiveMessage(handle func(msg []byte)) {
 	default:
 		fmt.Println("错误:\n", string(msg))
 	}
-
 }
