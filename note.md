@@ -127,3 +127,12 @@ context的创建
 当顶层的request请求函数结束后，我们就可以cancel掉某个context，从而通知别的routine结束
 
 WithValue方法可以把键值对加入context中，让不同的routine获取
+
+#关于rabbitmq
+1. 超级管理员(administrator)
+2. 监控者(monitoring)
+3. 策略制定者(policymaker)
+4. 普通管理者(management)
+5. 其他
+
+是否登陆和监控

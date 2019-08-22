@@ -1,9 +1,3 @@
-// Copyright 2015 The Gorilla WebSocket Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
-// +build ignore
-
 package main
 
 import (
@@ -23,27 +17,44 @@ import (
 	"haki/websocket"
 )
 
+var collection *websocket.Connection
+
+// Index xx
 func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	fmt.Fprint(w, "Welcome!\n")
 }
 
-func Hello(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+// SubsIndex xx
+func SubsIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	fmt.Fprintf(w, "hello")
+}
+
+// SubsCreate xx
+func SubsCreate(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	fmt.Fprintf(w, "hello")
+}
+
+// SubsDelete xx
+func SubsDelete(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	fmt.Fprintf(w, "hello")
 }
 
 func main() {
 
-	url := "mongodb://admin:kbr199sd5shi@localhost:27017"
-	baseName := "data_test"
-	mongoClient := mongodb.NewDBClient(url, baseName)
-	mongoClient.PingTest()
+	client := NewClient(config.RABBITMQ_URL, config.RABBITMQ_EXCHANGE)
+
+	defer client.Close()
+
+	mongoClient := mongodb.NewDBClient(config.MONGODB_URL, config.MONGODB_DATABASE)
 	database := mongoClient.GetDatabase()
 	collection := database.Collection("collection")
 
-	connection := websocket.NewConnection("wss://api.huobi.br.com/ws")
+	defer collection.CloseDatabase()
 
+	connection := websocket.NewConnection(config.WS_COIN_URL)
 	connection.Connect()
 	connection.HeartBeat()
+
 	defer connection.CloseConnection()
 
 	connection.Subscribe(map[string]string{
@@ -73,13 +84,12 @@ func main() {
 		}
 	})
 
-	// 这里有个问题应该通过HeartBeat()，来判断当前状态
-
 	router := httprouter.New()
 
-	//针对subs
 	router.GET("/", Index)
-	router.GET("/subs", Hello)
+	router.GET("/subs", SubsIndex)
+	router.POST("/subs", SubsCreate)
+	router.DELETE("/subs/:id", SubsDelete)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

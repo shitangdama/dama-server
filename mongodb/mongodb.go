@@ -43,3 +43,11 @@ func (mongoDB *MongoDB) PingTest() {
 func (mongoDB *MongoDB) GetDatabase() *mongo.Database {
 	return mongoDB.Client.Database(mongoDB.DBName)
 }
+
+// CloseDatabase xx
+func (mongoDB *MongoDB) CloseDatabase() error {
+	if mongoDB.Client != nil {
+		return mongoDB.Client.Disconnect(mongoDB.Ctx)
+	}
+	return nil
+}
