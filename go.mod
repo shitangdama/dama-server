@@ -7,6 +7,7 @@ require (
 	github.com/gorilla/websocket v1.4.0
 	github.com/julienschmidt/httprouter v1.2.0 // indirect
 	github.com/mongodb/mongo-go-driver v1.0.4
+	github.com/streadway/amqp v0.0.0-20190815230801-eade30b20f1d
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/tidwall/pretty v1.0.0 // indirect
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
