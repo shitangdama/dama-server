@@ -2,7 +2,6 @@ package mongodb
 
 import (
 	"context"
-	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -19,7 +18,7 @@ type MongoDB struct {
 
 // NewDBClient new
 func NewDBClient(url string, name string) *MongoDB {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx := context.TODO()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(url))
 	if err != nil {
 		panic(err)
@@ -40,7 +39,15 @@ func (mongoDB *MongoDB) PingTest() {
 	}
 }
 
-// Database returns a handle for a given database.
-func (mongoDB *MongoDB) Database() *mongo.Database {
+// GetDatabase returns a handle for a given database.
+func (mongoDB *MongoDB) GetDatabase() *mongo.Database {
 	return mongoDB.Client.Database(mongoDB.DBName)
+}
+
+// CloseDatabase xx
+func (mongoDB *MongoDB) CloseDatabase() error {
+	if mongoDB.Client != nil {
+		return mongoDB.Client.Disconnect(mongoDB.Ctx)
+	}
+	return nil
 }
