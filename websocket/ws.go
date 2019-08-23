@@ -9,10 +9,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-//
-
-var handledata map[string]func(msg []byte)
-
 // Connection struct
 type Connection struct {
 	Ws *websocket.Conn
