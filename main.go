@@ -1,150 +1,36 @@
 package main
 
 import (
+	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"haki/common"
 	"haki/config"
 	"haki/websocket"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
-	mux "github.com/julienschmidt/httprouter"
 )
 
 var connection *websocket.Connection
 
-type Route struct {
-	Name    string
-	Method  string
-	Pattern string
-	Handle  mux.Handle
-}
+// NewRouter xx
+func NewRouter() *httprouter.Router {
+	router := httprouter.New()
 
-type Routes []Route
+	// for _, route := range routes {
 
-// Index xx
-func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	fmt.Fprint(w, "Welcome!\n")
-}
+	/*
+		var handler mux.Handle
 
-// SubsIndex xx
-func SubsIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-
-	subs := connection.Subs
-
-	fmt.Println(subs)
-	if err := json.NewEncoder(w).Encode(subs); err != nil {
-		panic(err)
-	}
-}
-
-// SubsCreate xx
-func SubsCreate(w http.ResponseWriter, r *http.Request, _ mux.Params) {
-
-	var sub_key common.Sub
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
-	if err != nil {
-		panic(err)
-	}
-	if err := r.Body.Close(); err != nil {
-		panic(err)
-	}
-
-	if err := json.Unmarshal(body, &sub_key); err != nil {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(422) // unprocessable entity
-		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
-		}
-	}
-	fmt.Println(sub_key.Sub)
-
-	// s2 = append(s2, 5)
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(sub_key); err != nil {
-		panic(err)
-	}
-}
-
-// SubsDelete 取消订阅
-func SubsDelete(w http.ResponseWriter, r *http.Request, _ mux.Params) {
-
-	var sub_key common.Sub
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
-	if err != nil {
-		panic(err)
-	}
-	if err := r.Body.Close(); err != nil {
-		panic(err)
-	}
-
-	if err := json.Unmarshal(body, &sub_key); err != nil {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(422) // unprocessable entity
-		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
-		}
-	}
-
-	connection.Subs = common.DeleteByName(connection.Subs, sub_key.Sub)
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(sub_key); err != nil {
-		panic(err)
-	}
-
-}
-
-var routes = Routes{
-	Route{
-		"Index",
-		"GET",
-		"/",
-		Index,
-	},
-	Route{
-		"SubsIndex",
-		"GET",
-		"/subs",
-		SubsIndex,
-	},
-	Route{
-		"SubsCreate",
-		"POST",
-		"/subs",
-		SubsCreate,
-	},
-	// Route{
-	// 	"TodoDownload",
-	// 	"GET",
-	// 	"/todos.json",
-	// 	TodoDownload,
-	// },
-}
-
-func NewRouter() *mux.Router {
-
-	router := mux.New()
-
-	for _, route := range routes {
-
-		/*
-			var handler mux.Handle
-
-			handler = Logger(router, route.Method, route.Pattern, route.Name)
-		*/
-
-		router.Handle(route.Method, route.Pattern, route.Handle)
-	}
+		handler = Logger(router, route.Method, route.Pattern, route.Name)
+	*/
+	// router.Handle(route.Method, route.Pattern, route.Handle)
+	// }
 	return router
 }
 
@@ -166,32 +52,61 @@ func main() {
 
 	defer connection.CloseConnection()
 
-	connection.Subscribe(map[string]string{
-		"sub": "market.htusdt.kline.1min",
-		"id":  "1"})
-
 	// connection.Subscribe(map[string]string{
 	// 	"sub": "market.btcusdt.kline.1min",
 	// 	"id":  "1"})
 
-	// connection.Watch(func(msg []byte) {
-	// 	gzipreader, _ := gzip.NewReader(bytes.NewReader(msg))
-	// 	data, _ := ioutil.ReadAll(gzipreader)
-	// 	var resp map[string]interface{}
-	// 	json.Unmarshal(data, &resp)
+	// connection.Subscribe(map[string]string{
+	// 	"sub": "market.btcusdt.depth.step0",
+	// 	"id":  "1"})
+	connection.Subscribe(map[string]string{
+		"sub": "market.btcusdt.trade.detail",
+		"id":  "1"})
 
-	// 	if resp["ping"] != nil {
-	// 		connection.Ws.WriteJSON(map[string]interface{}{"pong": resp["ping"]})
-	// 	} else if resp["ch"] != nil {
-	// 		// kv := strings.Split(resp["ch"].(string), ".")
-	// 		// fmt.Println(kv)
-	// 		var ticker common.Ticker
-	// 		json.Unmarshal(data, &ticker)
-	// 		fmt.Println(ticker)
-	// 		// _, _ = collection.InsertOne(context.TODO(), ticker)
-	// 	} else {
-	// 	}
-	// })
+	// connection.Subscribe(map[string]string{
+	// 	"sub": "market.btcusdt.detail",
+	// 	"id":  "1"})
+
+	connection.Watch(func(msg []byte) {
+		gzipreader, _ := gzip.NewReader(bytes.NewReader(msg))
+		data, _ := ioutil.ReadAll(gzipreader)
+		var resp map[string]interface{}
+		json.Unmarshal(data, &resp)
+
+		if resp["ping"] != nil {
+			connection.Ws.WriteJSON(map[string]interface{}{"pong": resp["ping"]})
+		} else if resp["ch"] != nil {
+
+			params := strings.Split(resp["ch"].(string), ".")
+
+			// kv := strings.Split(resp["ch"].(string), ".")
+			// fmt.Println(kv)
+
+			fmt.Println(params[2])
+			switch params[2] {
+			case "kline":
+				var kTicker common.KTicker
+				json.Unmarshal(data, &kTicker)
+			case "depth":
+				var dTicker common.DTicker
+				json.Unmarshal(data, &dTicker)
+				fmt.Println(dTicker)
+			case "trade":
+				var tTicker common.TTicker
+				json.Unmarshal(data, &tTicker)
+				fmt.Println(tTicker)
+			case "detail":
+				var deTicker common.DeTicker
+				json.Unmarshal(data, &deTicker)
+				// fmt.Println(dTicker)
+			}
+
+			// _, _ = collection.InsertOne(context.TODO(), ticker)
+		} else {
+			// fmt.Println(data)
+		}
+		fmt.Println(resp)
+	})
 
 	router := NewRouter()
 
