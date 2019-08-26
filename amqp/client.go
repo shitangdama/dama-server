@@ -7,12 +7,8 @@ import (
 	"github.com/streadway/amqp"
 )
 
-const (
-	CONTENT_TYPE_JSON = "application/json"
-)
-
-// Amqp xx
-var Amqp *amqpClient
+// AmqpClient xx
+var AmqpClient *amqpClient
 
 type amqpClient struct {
 	Connection *amqp.Connection
@@ -37,7 +33,7 @@ func NewClient(url string, exchange string) {
 		nil,   // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
-	Amqp = &amqpClient{Connection: conn, Exchange: exchange, Channel: ch}
+	AmqpClient = &amqpClient{Connection: conn, Exchange: exchange, Channel: ch}
 	// return &amqpClient{Connection: conn, Exchange: exchange, Channel: ch}
 }
 
@@ -55,7 +51,7 @@ func (client *amqpClient) Publish(routingKey string, params interface{}) error {
 	}
 
 	publishing := amqp.Publishing{
-		ContentType:     CONTENT_TYPE_JSON,
+		ContentType:     "application/json",
 		ContentEncoding: "UTF-8",
 		Body:            data,
 	}

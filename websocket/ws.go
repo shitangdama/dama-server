@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"haki/common"
+	"haki/mongodb"
 	"io/ioutil"
 	"log"
 	"strings"
@@ -151,9 +152,11 @@ func (c *Connection) Watch() {
 					if resp["ping"] != nil {
 						c.Ws.WriteJSON(map[string]interface{}{"pong": resp["ping"]})
 					} else if resp["ch"] != nil {
-
+						handleData(resp["ch"].(string), msg)
+					} else if resp["pong"] != nil {
+						c.State = Running
 					} else {
-						fmt.Println("错误:\n", string(msg))
+						fmt.Println("错误:\n", resp)
 					}
 
 				case websocket.PongMessage:
@@ -176,17 +179,26 @@ func handleData(ch string, msg []byte) {
 	case "kline":
 		var kTicker common.KTicker
 		json.Unmarshal(data, &kTicker)
+		fmt.Println(kTicker)
+		collection := mongodb.MongoClient.GetCollection("huobi", "kline")
+		_, _ = collection.InsertOne(context.TODO(), kTicker)
+
 	case "depth":
 		var dTicker common.DTicker
 		json.Unmarshal(data, &dTicker)
 		fmt.Println(dTicker)
+		collection := mongodb.MongoClient.GetCollection("huobi", "depth")
+		_, _ = collection.InsertOne(context.TODO(), dTicker)
 	case "trade":
 		var tTicker common.TTicker
 		json.Unmarshal(data, &tTicker)
 		fmt.Println(tTicker)
+		collection := mongodb.MongoClient.GetCollection("huobi", "trade")
+		_, _ = collection.InsertOne(context.TODO(), tTicker)
 	case "detail":
 		var deTicker common.DeTicker
 		json.Unmarshal(data, &deTicker)
+		collection := mongodb.MongoClient.GetCollection("huobi", "detail")
+		_, _ = collection.InsertOne(context.TODO(), deTicker)
 	}
-	// _, _ = collection.InsertOne(context.TODO(), ticker)
 }
