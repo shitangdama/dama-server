@@ -1,9 +1,10 @@
-package main
+package router
 
 import (
 	"encoding/json"
 	"fmt"
 	"haki/common"
+	"haki/websocket"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 
 //	"net/http"
 
+//Route 路由结构
 type Route struct {
 	Name    string
 	Method  string
@@ -20,7 +22,24 @@ type Route struct {
 	Handle  httprouter.Handle
 }
 
+// Routes 路由数组
 type Routes []Route
+
+// NewRouter xx
+func NewRouter() *httprouter.Router {
+	router := httprouter.New()
+
+	for _, route := range routes {
+
+		/*
+			var handler mux.Handle
+
+			handler = Logger(router, route.Method, route.Pattern, route.Name)
+		*/
+		router.Handle(route.Method, route.Pattern, route.Handle)
+	}
+	return router
+}
 
 // Index xx
 func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -32,7 +51,7 @@ func SubsIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 
-	subs := connection.Subs
+	subs := websocket.WsConnection.Subs
 
 	fmt.Println(subs)
 	if err := json.NewEncoder(w).Encode(subs); err != nil {
@@ -43,7 +62,7 @@ func SubsIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 // SubsCreate xx
 func SubsCreate(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
-	var sub_key common.Sub
+	var subKey common.Sub
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		panic(err)
@@ -52,20 +71,20 @@ func SubsCreate(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		panic(err)
 	}
 
-	if err := json.Unmarshal(body, &sub_key); err != nil {
+	if err := json.Unmarshal(body, &subKey); err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(422) // unprocessable entity
 		if err := json.NewEncoder(w).Encode(err); err != nil {
 			panic(err)
 		}
 	}
-	fmt.Println(sub_key.Sub)
+	fmt.Println(subKey.Sub)
 
 	// s2 = append(s2, 5)
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(sub_key); err != nil {
+	if err := json.NewEncoder(w).Encode(subKey); err != nil {
 		panic(err)
 	}
 }
@@ -73,7 +92,7 @@ func SubsCreate(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 // SubsDelete 取消订阅
 func SubsDelete(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
-	var sub_key common.Sub
+	var subKey common.Sub
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		panic(err)
@@ -82,7 +101,7 @@ func SubsDelete(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		panic(err)
 	}
 
-	if err := json.Unmarshal(body, &sub_key); err != nil {
+	if err := json.Unmarshal(body, &subKey); err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(422) // unprocessable entity
 		if err := json.NewEncoder(w).Encode(err); err != nil {
@@ -90,11 +109,11 @@ func SubsDelete(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		}
 	}
 
-	connection.Subs = common.DeleteByName(connection.Subs, sub_key.Sub)
+	websocket.WsConnection.Subs = common.DeleteByName(websocket.WsConnection.Subs, subKey.Sub)
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(sub_key); err != nil {
+	if err := json.NewEncoder(w).Encode(subKey); err != nil {
 		panic(err)
 	}
 

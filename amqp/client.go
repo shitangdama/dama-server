@@ -11,7 +11,8 @@ const (
 	CONTENT_TYPE_JSON = "application/json"
 )
 
-// var Amqp *amqp.Connection
+// Amqp xx
+var Amqp *amqpClient
 
 type amqpClient struct {
 	Connection *amqp.Connection
@@ -20,7 +21,7 @@ type amqpClient struct {
 }
 
 // NewClient xx amqpClient
-func NewClient(url string, exchange string) *amqpClient {
+func NewClient(url string, exchange string) {
 	conn, err := amqp.Dial(url)
 	failOnError(err, "Failed to connect to RabbitMQ")
 
@@ -36,8 +37,8 @@ func NewClient(url string, exchange string) *amqpClient {
 		nil,   // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
-
-	return &amqpClient{Connection: conn, Exchange: exchange, Channel: ch}
+	Amqp = &amqpClient{Connection: conn, Exchange: exchange, Channel: ch}
+	// return &amqpClient{Connection: conn, Exchange: exchange, Channel: ch}
 }
 
 func (client *amqpClient) Close() {

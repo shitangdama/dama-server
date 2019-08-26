@@ -1,13 +1,22 @@
 package websocket
 
 import (
+	"bytes"
+	"compress/gzip"
 	"context"
+	"encoding/json"
 	"fmt"
+	"haki/common"
+	"io/ioutil"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
 )
+
+// WsConnection 所有的都是单例模式
+var WsConnection *Connection
 
 // Connection struct
 type Connection struct {
@@ -28,9 +37,9 @@ const (
 )
 
 // NewConnection return new connection
-func NewConnection(url string) *Connection {
+func NewConnection(url string) {
 	ctx, cancel := context.WithCancel(context.TODO())
-	return &Connection{Addr: url, Ws: nil, State: Stopped, ctx: ctx, cancel: cancel}
+	WsConnection = &Connection{Addr: url, Ws: nil, State: Stopped, ctx: ctx, cancel: cancel}
 }
 
 // Connect will connect
@@ -116,46 +125,68 @@ func (c *Connection) Subscribe(subEvent interface{}) error {
 }
 
 // Watch xxx
-func (c *Connection) Watch(handle func(msg []byte)) {
+func (c *Connection) Watch() {
 	go func() {
 		for {
 			select {
 			case <-c.ctx.Done():
 				return
 			default:
-				// err := c.Ws.SetReadDeadline(time.Now().Add(5 * time.Second))
-				// if err != nil {
-				// 	// 	c.ReConnect()
-				// 	fmt.Println("重启2")
-				// 	continue
-				// }
-				c.ReceiveMessage(handle)
+				t, msg, err := c.Ws.ReadMessage()
+
+				if err != nil {
+					fmt.Println("重启")
+					err := c.ReConnect()
+					if err != nil {
+						time.Sleep(1 * time.Second)
+					}
+					continue
+				}
+				switch t {
+				case websocket.TextMessage, websocket.BinaryMessage:
+					gzipreader, _ := gzip.NewReader(bytes.NewReader(msg))
+					data, _ := ioutil.ReadAll(gzipreader)
+					var resp map[string]interface{}
+					json.Unmarshal(data, &resp)
+					if resp["ping"] != nil {
+						c.Ws.WriteJSON(map[string]interface{}{"pong": resp["ping"]})
+					} else if resp["ch"] != nil {
+
+					} else {
+						fmt.Println("错误:\n", string(msg))
+					}
+
+				case websocket.PongMessage:
+					c.State = Running
+				case websocket.CloseMessage:
+					c.State = Stopped
+				default:
+					fmt.Println("错误:\n", string(msg))
+				}
 			}
 		}
 	}()
 }
 
-// ReceiveMessage will handledata
-func (c *Connection) ReceiveMessage(handle func(msg []byte)) {
-
-	t, msg, err := c.Ws.ReadMessage()
-	if err != nil {
-		fmt.Println("重启")
-		err := c.ReConnect()
-		if err != nil {
-			time.Sleep(1 * time.Second)
-		}
-		return
+func handleData(ch string, msg []byte) {
+	gzipreader, _ := gzip.NewReader(bytes.NewReader(msg))
+	data, _ := ioutil.ReadAll(gzipreader)
+	params := strings.Split(ch, ".")
+	switch params[2] {
+	case "kline":
+		var kTicker common.KTicker
+		json.Unmarshal(data, &kTicker)
+	case "depth":
+		var dTicker common.DTicker
+		json.Unmarshal(data, &dTicker)
+		fmt.Println(dTicker)
+	case "trade":
+		var tTicker common.TTicker
+		json.Unmarshal(data, &tTicker)
+		fmt.Println(tTicker)
+	case "detail":
+		var deTicker common.DeTicker
+		json.Unmarshal(data, &deTicker)
 	}
-
-	switch t {
-	case websocket.TextMessage, websocket.BinaryMessage:
-		handle(msg)
-	case websocket.PongMessage:
-
-	case websocket.CloseMessage:
-		c.State = Stopped
-	default:
-		fmt.Println("错误:\n", string(msg))
-	}
+	// _, _ = collection.InsertOne(context.TODO(), ticker)
 }
