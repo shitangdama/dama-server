@@ -1,95 +1,51 @@
 package main
 
 import (
-	"bytes"
-	"compress/gzip"
-	"context"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
+	"haki/config"
+	"haki/mongodb"
+	"haki/router"
+	"haki/websocket"
 	"log"
 	"net/http"
-
-	"github.com/julienschmidt/httprouter"
-
-	"haki/common"
-	"haki/mongodb"
-	"haki/websocket"
 )
-
-var collection *websocket.Connection
-
-// Index xx
-func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	fmt.Fprint(w, "Welcome!\n")
-}
-
-// SubsIndex xx
-func SubsIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	fmt.Fprintf(w, "hello")
-}
-
-// SubsCreate xx
-func SubsCreate(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	fmt.Fprintf(w, "hello")
-}
-
-// SubsDelete xx
-func SubsDelete(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	fmt.Fprintf(w, "hello")
-}
 
 func main() {
 
-	client := NewClient(config.RABBITMQ_URL, config.RABBITMQ_EXCHANGE)
+	// client := amqp.NewClient(config.RABBITMQ_URL, config.RABBITMQ_EXCHANGE)
 
-	defer client.Close()
+	// defer client.Close()
 
-	mongoClient := mongodb.NewDBClient(config.MONGODB_URL, config.MONGODB_DATABASE)
-	database := mongoClient.GetDatabase()
-	collection := database.Collection("collection")
+	mongodb.NewDBClient(config.MONGODB_URL, config.MONGODB_DATABASE)
+	// database := mongoClient.GetDatabase()
+	// collection := database.Collection("collection")
 
-	defer collection.CloseDatabase()
+	// defer mongoClient.CloseDatabase()
 
-	connection := websocket.NewConnection(config.WS_COIN_URL)
-	connection.Connect()
-	connection.HeartBeat()
+	websocket.NewConnection(config.WS_COIN_URL)
+	websocket.WsConnection.Connect()
+	websocket.WsConnection.HeartBeat()
 
-	defer connection.CloseConnection()
+	defer websocket.WsConnection.CloseConnection()
 
-	connection.Subscribe(map[string]string{
-		"sub": "market.htusdt.kline.1min",
-		"id":  "1"})
-
-	connection.Subscribe(map[string]string{
+	websocket.WsConnection.Subscribe(map[string]string{
 		"sub": "market.btcusdt.kline.1min",
 		"id":  "1"})
 
-	connection.Watch(func(msg []byte) {
-		gzipreader, _ := gzip.NewReader(bytes.NewReader(msg))
-		data, _ := ioutil.ReadAll(gzipreader)
-		var resp map[string]interface{}
-		json.Unmarshal(data, &resp)
+	websocket.WsConnection.Subscribe(map[string]string{
+		"sub": "market.btcusdt.depth.step0",
+		"id":  "1"})
 
-		if resp["ping"] != nil {
-			connection.Ws.WriteJSON(map[string]interface{}{"pong": resp["ping"]})
-		} else if resp["ch"] != nil {
-			// kv := strings.Split(resp["ch"].(string), ".")
-			// fmt.Println(kv)
-			var ticker common.Ticker
-			json.Unmarshal(data, &ticker)
-			fmt.Println(ticker)
-			_, _ = collection.InsertOne(context.TODO(), ticker)
-		} else {
-		}
-	})
+	websocket.WsConnection.Subscribe(map[string]string{
+		"sub": "market.btcusdt.trade.detail",
+		"id":  "1"})
 
-	router := httprouter.New()
+	websocket.WsConnection.Subscribe(map[string]string{
+		"sub": "market.btcusdt.detail",
+		"id":  "1"})
 
-	router.GET("/", Index)
-	router.GET("/subs", SubsIndex)
-	router.POST("/subs", SubsCreate)
-	router.DELETE("/subs/:id", SubsDelete)
+	websocket.WsConnection.Watch()
+
+	router := router.NewRouter()
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

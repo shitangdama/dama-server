@@ -5,7 +5,7 @@ require (
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/gorilla/websocket v1.4.0
-	github.com/julienschmidt/httprouter v1.2.0 // indirect
+	github.com/julienschmidt/httprouter v1.2.0
 	github.com/mongodb/mongo-go-driver v1.0.4
 	github.com/streadway/amqp v0.0.0-20190815230801-eade30b20f1d
 	github.com/stretchr/testify v1.3.0 // indirect
