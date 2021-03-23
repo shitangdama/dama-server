@@ -2,7 +2,22 @@ from tortoise import Model, fields
 
 class CoinTicker(Model):
     id = fields.IntField(pk=True)
-    amount = fields.CharField(50)
+    symbol = fields.TextField()
+    name = fields.TextField()
+    amount = fields.FloatField()
+    count = fields.FloatField()
+    open = fields.FloatField()
+    close = fields.FloatField()
+    high = fields.FloatField()
+    low = fields.FloatField()
+    vol = fields.FloatField()
+    bid = fields.FloatField()
+    bidSize = fields.FloatField()
+    ask = fields.FloatField()
+    askSize = fields.FloatField()
+    
+    self_trade = fields.JSONField()
+    contrast_trade = fields.JSONField()
 
     def __str__(self):
         return f"User {self.id}: {self.name}"

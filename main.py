@@ -8,6 +8,7 @@ import aiohttp_jinja2
 import jinja2
 from aiohttp import web
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from tortoise.contrib.aiohttp import register_tortoise
 
 PROJECT_ROOT = pathlib.Path(__file__).parent
 
@@ -44,9 +45,9 @@ async def init_app():
         loader=jinja2.FileSystemLoader(str(PROJECT_ROOT / 'templates'))
     )
 
-    # register_tortoise(
-    #     app, db_url="sqlite://:memory:", modules={"models": ["models"]}, generate_schemas=True
-    # )
+    register_tortoise(
+        app, db_url="postgres://postgres:changeme@localhost:5432/postgres", modules={"models": ["models"]}, generate_schemas=True
+    )
 
     app.router.add_static('/static/', path=PROJECT_ROOT / 'static', name='static')
 
