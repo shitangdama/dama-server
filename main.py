@@ -2,15 +2,20 @@ import logging
 import sys
 import pathlib
 import asyncio
+import uvloop
 
 import aiohttp_jinja2
 import jinja2
 from aiohttp import web
-
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 PROJECT_ROOT = pathlib.Path(__file__).parent
 
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+loop = asyncio.get_event_loop()
 
+async def update():
+    print(1111)
 
 @aiohttp_jinja2.template('index.html')
 async def index(request):
@@ -29,6 +34,8 @@ async def init_app():
 
     setup_routes(app)
 
+    # loop.create_task(init_db())
+    # loop.create_task(run_migrations())
     # db_pool = await init_db(app)
 
     # setup_session(app, RedisStorage(redis_pool))
@@ -37,6 +44,9 @@ async def init_app():
         loader=jinja2.FileSystemLoader(str(PROJECT_ROOT / 'templates'))
     )
 
+    # register_tortoise(
+    #     app, db_url="sqlite://:memory:", modules={"models": ["models"]}, generate_schemas=True
+    # )
 
     app.router.add_static('/static/', path=PROJECT_ROOT / 'static', name='static')
 
@@ -44,8 +54,11 @@ async def init_app():
 
 def main():
     # config = load_config(configpath)
-
     # loop = asyncio.get_event_loop()
+
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(update, trigger='cron', minute='*/1')
+    scheduler.start()
 
     logging.basicConfig(level=logging.DEBUG)
     app = init_app()
