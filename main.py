@@ -2,7 +2,7 @@ import logging
 import sys
 import pathlib
 import asyncio
-import uvloop
+# import uvloop
 
 import aiohttp_jinja2
 import jinja2
@@ -11,7 +11,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 PROJECT_ROOT = pathlib.Path(__file__).parent
 
-asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+# asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 loop = asyncio.get_event_loop()
 
 async def update():
