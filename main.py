@@ -35,18 +35,31 @@ async def update():
                 "high":item.high,
                 "vol":item.vol,
                 "symbol":item.symbol,
+                "name": item.symbol[0:-4]
             }
             items.append(tmp)
             if item.symbol == "btcusdt":
                 btc = tmp
-
-    for item in items:
-        if item["symbol"] == "btcusdt":
-            pass
-        print(item["symbol"])
-        coin, created = await CoinTicker.get_or_create(defaults=item, name=item["symbol"][0:-4])
-
-    print(22222)
+    btc["self_trade"] = ((btc["close"] - btc["open"])/btc["open"]) * 100
+    for coin in items:
+        if coin["symbol"] == "btcusdt":
+            coin["self_trade"] = btc["self_trade"]
+            coin["contrast_trade"] = 0.0
+        else:
+            coin["self_trade"] = ((coin["close"] - coin["open"])/coin["open"]) * 100
+            coin["contrast_trade"] = coin["self_trade"] - btc["self_trade"]
+        coin_data, created = await CoinTicker.get_or_create(symbol=coin["symbol"],name=coin["name"])
+        await CoinTicker.filter(symbol=coin_data.symbol).update(                
+                amount=coin["amount"],
+                count=coin["count"],
+                open=coin["open"],
+                close=coin["close"],
+                low=coin["low"],
+                high=coin["high"],
+                vol=coin["vol"],
+                self_trade= coin["self_trade"],
+                contrast_trade = coin["contrast_trade"],
+            )
 
     # 这里
 
