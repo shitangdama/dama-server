@@ -3,7 +3,8 @@ import sys
 import pathlib
 import asyncio
 # import uvloop
-
+from huobi.client.market import MarketClient
+from models import CoinTicker
 import aiohttp_jinja2
 import jinja2
 from aiohttp import web
@@ -16,7 +17,38 @@ PROJECT_ROOT = pathlib.Path(__file__).parent
 loop = asyncio.get_event_loop()
 
 async def update():
-    print(1111)
+    market_client = MarketClient(init_log=True, url="https://api.huobi.be")
+    print(11111)
+    list_obj = market_client.get_market_tickers()
+
+    btc = {}
+    items = []
+    for item in list_obj:
+        if item.symbol.endswith("usdt"):
+
+            tmp = {
+                "amount": item.amount,
+                "count": item.count,
+                "open": item.open,
+                "close": item.close,
+                "low": item.low,
+                "high":item.high,
+                "vol":item.vol,
+                "symbol":item.symbol,
+            }
+            items.append(tmp)
+            if item.symbol == "btcusdt":
+                btc = tmp
+
+    for item in items:
+        if item["symbol"] == "btcusdt":
+            pass
+        print(item["symbol"])
+        coin, created = await CoinTicker.get_or_create(defaults=item, name=item["symbol"][0:-4])
+
+    print(22222)
+
+    # 这里
 
 @aiohttp_jinja2.template('index.html')
 async def index(request):

@@ -2,25 +2,20 @@ from tortoise import Model, fields
 
 class CoinTicker(Model):
     id = fields.IntField(pk=True)
-    symbol = fields.TextField()
-    name = fields.TextField()
-    amount = fields.FloatField()
-    count = fields.FloatField()
-    open = fields.FloatField()
-    close = fields.FloatField()
-    high = fields.FloatField()
-    low = fields.FloatField()
-    vol = fields.FloatField()
-    bid = fields.FloatField()
-    bidSize = fields.FloatField()
-    ask = fields.FloatField()
-    askSize = fields.FloatField()
-
-    self_trade = fields.JSONField()
-    contrast_trade = fields.JSONField()
+    symbol = fields.CharField(unique=True,max_length=128)
+    name = fields.CharField(unique=True,max_length=128)
+    amount = fields.FloatField(default=0.0)
+    count = fields.FloatField(default=0.0)
+    open = fields.FloatField(default=0.0)
+    close = fields.FloatField(default=0.0)
+    high = fields.FloatField(default=0.0)
+    low = fields.FloatField(default=0.0)
+    vol = fields.FloatField(default=0.0)
+    self_trade = fields.FloatField(default=0.0)
+    contrast_trade = fields.FloatField(default=0.0)
 
     def __str__(self):
-        return f"User {self.id}: {self.name}"
+        return f"User {self.id}: {self.symbol}"
 
     class Meta:
         table = "coin_ticker"
