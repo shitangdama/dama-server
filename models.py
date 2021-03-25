@@ -19,20 +19,39 @@ class CoinTicker(Model):
 
     class Meta:
         table = "coin_ticker"
-        # PrintBasic.print_basic(self.amount, format_data + "Amount")
-        # PrintBasic.print_basic(self.count, format_data + "Count")
-        # PrintBasic.print_basic(self.open, format_data + "Opening Price")
-        # PrintBasic.print_basic(self.close, format_data + "Last Price")
-        # PrintBasic.print_basic(self.low, format_data + "Low Price")
-        # PrintBasic.print_basic(self.high, format_data + "High Price")
-        # PrintBasic.print_basic(self.vol, format_data + "Vol")
-        # PrintBasic.print_basic(self.symbol, format_data + "Trading Symbol")
-        # PrintBasic.print_basic(self.bid, format_data + "Best Bid Price")
-        # PrintBasic.print_basic(self.bidSize, format_data + "Best Bid Size")
-        # PrintBasic.print_basic(self.ask, format_data + "Best Ask Price")
-        # PrintBasic.print_basic(self.askSize, format_data + "Best Ask Size")
+
+class Coinkline(Model):
+    id = fields.IntField(pk=True)
+    symbol = fields.CharField(unique=True,max_length=128)
+    name = fields.CharField(unique=True,max_length=128)
+    period = fields.CharField(max_length=128)
+    time_id = fields.BigIntField()
+    count = fields.BigIntField(default=0)
+    open = fields.FloatField(default=0.0)
+    close = fields.FloatField(default=0.0)
+    high = fields.FloatField(default=0.0)
+    low = fields.FloatField(default=0.0)
+    vol = fields.FloatField(default=0.0)
+
+    def __str__(self):
+        return f"User {self.id}: {self.symbol}"
+
+    class Meta:
+        table = "coin_kline"
 
 
+class CoinSubscribe(Model):
+    id = fields.IntField(pk=True)
+    symbol = fields.CharField(unique=True,max_length=128)
+    name = fields.CharField(unique=True,max_length=128)
+    day_trend = fields.JSONField()
+    min_trend = fields.JSONField()
+    hour_trend = fields.JSONField()
+    day_trend = fields.JSONField()
+    min_trend = fields.JSONField()
+    hour_trend = fields.JSONField()
+    class Meta:
+        table = "coin_subscribe"
 
 # symbol	string	true	NA	交易对	btcusdt, ethbtc等（如需获取杠杆ETP净值K线，净值symbol = 杠杆ETP交易对symbol + 后缀‘nav’，例如：btc3lusdtnav）
 # period	string	true	NA	返回数据时间粒度，也就是每根蜡烛的时间区间	1min, 5min, 15min, 30min, 60min, 4hour, 1day, 1mon, 1week, 1year
