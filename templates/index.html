@@ -48,7 +48,7 @@
                 {% if coin.self_trade > 0 %}
                   <strong class="d-block text-success font-weight-normal">{{coin.self_trade|round(2)}}%</strong>
                 {% else %}
-                  <strong class="d-block text-danger text-danger font-weight-normal ">{{coin.contrast_trade|round(2)}}%</strong>
+                  <strong class="d-block text-danger text-danger font-weight-normal ">{{coin.self_trade|round(2)}}%</strong>
                 {% endif %}
               </td>
               <td class="py-3">

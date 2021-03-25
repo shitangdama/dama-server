@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% set title = "Main" %}
+
+{% block content %}
+<div class="mt-5">
+  <div class="card mb-3 mb-md-4">
+    <div class="card-header">
+      <h5 class="h6 text-uppercase font-weight-semi-bold mb-0">My portfolio</h5>
+    </div>
+
+    <div class="card-body p-0">
+      <div class="table-responsive datatable">
+        <table class="js-datatable card-table text-nowrap" data-dt-info="#datatableInfo" data-dt-search="#datatableSearch" data-dt-entries="#datatableEntries" data-dt-is-show-paging="true" data-dt-pagination="datatablePagination" data-dt-page-length="6" data-dt-is-responsive="false" data-dt-pagination-classes="pagination justify-content-end font-weight-semi-bold mb-0" data-dt-pagination-items-classes="page-item d-none d-md-block" data-dt-pagination-links-classes="page-link" data-dt-pagination-next-classes="page-item" data-dt-pagination-next-link-classes="page-link" data-dt-pagination-next-link-markup="<i class=&quot;nova-angle-right icon-text icon-text-xs d-inline-block&quot;></i>" data-dt-pagination-prev-classes="page-item" data-dt-pagination-prev-link-classes="page-link" data-dt-pagination-prev-link-markup="<i class=&quot;nova-angle-left icon-text icon-text-xs d-inline-block&quot;></i>">
+          <thead>
+          <tr class="small text-muted">
+            <th class="font-weight-normal py-3">Currency</th>
+            <th class="font-weight-normal py-3">24hr vol</th>
+            <th class="font-weight-normal py-3">Available</th>
+            <th class="font-weight-normal py-3">Buing Cost</th>
+            <th class="font-weight-normal py-3">Current Value</th>
+            <th class="font-weight-normal py-3">Last Price</th>
+            <th class="font-weight-normal py-3">24hr Self Trade</th>
+            <th class="font-weight-normal py-3">24hr Contrast</th>
+            <th class="font-weight-normal text-center py-3 d-print-none">Action</th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="media d-block d-md-flex align-items-center p-3 p-md-4">
+        <div id="datatableInfo" class="d-flex mb-2 mb-md-0"></div>
+
+        <nav id="datatablePagination" class="d-flex ml-md-auto d-print-none" aria-label="Pagination"></nav>
+      </div>
+    </div>
+
+
+  </div>
+</div>
+{% endblock %}

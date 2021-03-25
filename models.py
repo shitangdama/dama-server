@@ -22,8 +22,8 @@ class CoinTicker(Model):
 
 class Coinkline(Model):
     id = fields.IntField(pk=True)
-    symbol = fields.CharField(unique=True,max_length=128)
-    name = fields.CharField(unique=True,max_length=128)
+    symbol = fields.CharField(max_length=128)
+    name = fields.CharField(max_length=128)
     period = fields.CharField(max_length=128)
     time_id = fields.BigIntField()
     count = fields.BigIntField(default=0)
