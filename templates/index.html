@@ -33,9 +33,9 @@
                 {{coin.name.upper()}}
               </td>
               <td class="py-3">{{coin.vol|round(2)}}</td>
-              <td class="py-3">48.55854515</td>
+              <td class="py-3">{{coin.open|round(2)}}</td>
               <td class="py-3">
-                <strong class="d-block font-weight-normal">449.967</strong>
+                <strong class="d-block font-weight-normal">{{coin.close|round(2)}}</strong>
               </td>
               <td class="py-3">
                 <strong class="d-block font-weight-normal">47.00321779</strong>
@@ -44,7 +44,6 @@
                 <strong class="d-block font-weight-normal">53.67110896</strong>
               </td>
               <td class="py-3">
-                
                 {% if coin.self_trade > 0 %}
                   <strong class="d-block text-success font-weight-normal">{{coin.self_trade|round(2)}}%</strong>
                 {% else %}

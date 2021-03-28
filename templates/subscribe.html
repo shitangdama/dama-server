@@ -15,10 +15,6 @@
           <thead>
           <tr class="small text-muted">
             <th class="font-weight-normal py-3">Currency</th>
-            <th class="font-weight-normal py-3">24hr vol</th>
-            <th class="font-weight-normal py-3">Available</th>
-            <th class="font-weight-normal py-3">Buing Cost</th>
-            <th class="font-weight-normal py-3">Current Value</th>
             <th class="font-weight-normal py-3">Last Price</th>
             <th class="font-weight-normal py-3">24hr Self Trade</th>
             <th class="font-weight-normal py-3">24hr Contrast</th>
@@ -26,6 +22,26 @@
           </tr>
           </thead>
           <tbody>
+            {% for coin in coins %}
+            <tr>
+              <td class="py-3">
+                <span class="d-none">1</span>
+                {{coin.name.upper()}}
+              </td>
+              <td class="py-3">
+                <div data-id='self' info_5min='{{ coin.trend_5min|tojson }}' style="width: 250px;height: 80px;"></div>
+              </td>
+              <td class="py-3">
+                <div data-id='contrast' info_5min='{{ coin.trend_5min|tojson }}' style="width: 250px;height: 80px;"></div>
+              </td>
+              <td class="py-3">
+                <div data-id='vol' info_5min='{{ coin.trend_5min|tojson }}' style="width: 250px;height: 80px;"></div>
+              </td>
+              <td class="py-3 text-right d-print-none">
+                <a class="btn btn-outline-primary" href="#">Sell</a>
+              </td>
+            </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>

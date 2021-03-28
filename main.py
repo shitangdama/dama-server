@@ -11,7 +11,7 @@ from aiohttp import web
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from tortoise.contrib.aiohttp import register_tortoise
 
-from models import CoinTicker
+from models import CoinTicker, CoinSubscribe
 from job import kline_job, info_job
 
 PROJECT_ROOT = pathlib.Path(__file__).parent
@@ -28,9 +28,8 @@ async def index(request):
 
 @aiohttp_jinja2.template('subscribe.html')
 async def subscribe(request):
-    # coins = await CoinTicker.all().order_by("-vol")
-    # print(coins)
-    return {'coins': 1111}
+    coins = await CoinSubscribe.all().order_by("id")
+    return {'coins': coins}
 
 def setup_routes(app):
     app.router.add_get('/', index)
@@ -56,7 +55,7 @@ async def init_app():
 
 def main():
     scheduler = AsyncIOScheduler()
-    # scheduler.add_job(update, trigger='cron', minute='*/1')
+    # scheduler.add_job(info_job, trigger='cron', minute='*/1')
     scheduler.add_job(kline_job, trigger='cron', minute='*/1')
     scheduler.start()
 

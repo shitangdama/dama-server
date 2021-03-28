@@ -13,6 +13,7 @@ class CoinTicker(Model):
     vol = fields.FloatField(default=0.0)
     self_trade = fields.FloatField(default=0.0)
     contrast_trade = fields.FloatField(default=0.0)
+    subscribe = fields.BooleanField(default=False)
 
     def __str__(self):
         return f"User {self.id}: {self.symbol}"
@@ -42,14 +43,12 @@ class Coinkline(Model):
 
 class CoinSubscribe(Model):
     id = fields.IntField(pk=True)
-    symbol = fields.CharField(unique=True,max_length=128)
-    name = fields.CharField(unique=True,max_length=128)
-    day_trend = fields.JSONField()
-    min_trend = fields.JSONField()
-    hour_trend = fields.JSONField()
-    day_trend = fields.JSONField()
-    min_trend = fields.JSONField()
-    hour_trend = fields.JSONField()
+    symbol = fields.CharField(max_length=128)
+    name = fields.CharField(max_length=128)
+    trend_day = fields.JSONField(default={})
+    trend_min = fields.JSONField(default={})
+    trend_5min = fields.JSONField(default={})
+    trend_hour = fields.JSONField(default={})
     class Meta:
         table = "coin_subscribe"
 
