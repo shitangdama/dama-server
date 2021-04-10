@@ -1,27 +1,16 @@
-
 from huobi.client.market import MarketClient
 from huobi.constant import *
-from huobi.utils import *
-from models import Coinkline
+from huobi.exception.huobi_api_exception import HuobiApiException
+from huobi.model.market.candlestick_event import CandlestickEvent
 
 
-market_client = MarketClient(init_log=True, url="https://api.huobi.be")
-interval = CandlestickInterval.MIN5
-symbol = "ethusdt"
-# 200
-list_obj = market_client.get_candlestick(symbol, interval, 10)
-LogInfo.output("---- {interval} candlestick for {symbol} ----".format(interval=interval, symbol=symbol))
-LogInfo.output_list(list_obj)
+def callback(candlestick_event: 'CandlestickEvent'):
+    candlestick_event.print_object()
+    print("\n")
 
-for item in list_obj:
-    coin = await Coinkline.get_or_create(symbol=item.symbol, name=item.symbol[0:-4], time_id=item.id)
-    await Coinkline.filter(id=item.id).update(                
-        count=item.count,
-        open=item.open,
-        close=item.close,
-        low=item.low,
-        high=item.high,
-        vol=item.vol,
-        period=CandlestickInterval.MIN5
-    )
-# Coinkline
+
+def error(e: 'HuobiApiException'):
+    print(e.error_code + e.error_message)
+
+market_client = MarketClient(url='wss://api.huobi.de.com/swap-ws')
+market_client.sub_candlestick("btcusdt,ethusdt", CandlestickInterval.MIN1, callback, error)
