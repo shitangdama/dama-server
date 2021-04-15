@@ -1,4 +1,4 @@
-version: '3.5'
+version: '3'
 
 services:
   postgres:
@@ -31,6 +31,13 @@ services:
     networks:
       - postgres
     restart: unless-stopped
+
+  nats:
+    image: nats:latest
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+      - "6222:6222"
 
 networks:
   postgres:
