@@ -1,3 +1,4 @@
+
 // var myChart = echarts.init(document.getElementById('main'));
 
 var table_type = "5min"
